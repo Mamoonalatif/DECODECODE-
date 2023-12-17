@@ -13,8 +13,8 @@ int windowHeight = 730;
 int score = 0;
 int highscore = 0;
 int level = 1;
-int qs = 7;
-int ans[8] = { 2,3,1,2,1,0,3,2 };
+int qs = 1;
+int ans[9] = { 2,3,1,2,1,0,2,1,2 };
 float rectX, rectY, rectSize, rectWidth, rectHeight;
 double mainmenubar[7] = { 550, 200, 200, 50,0.102, 0.306, 0.596 };
 double optionrectangles[4][7] = {
@@ -33,6 +33,7 @@ bool mainmenu = true;
 bool showquestion = false;
 bool showhighscore = false;
 bool resumegame = false;
+bool gamewon = false;
 bool gameover = false;
 
 void init() { //user defined to perform additional initializations like setting clearcolour
@@ -202,12 +203,13 @@ bool checkMouseClick(int mouseX, int mouseY, float x, float y, float width, floa
 void mouseClick(int button, int state, int x, int y) { //changes if mouse is clciked on screen
     if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) { //if left mouse button is pressed down
         //if mouse clicked occur within specific area then changing flags and transitions
-        if (showhighscore == true || gameover == true) {
+        if (showhighscore == true || gameover == true || gamewon == true) {
             if (checkMouseClick(x, windowHeight - y, 550, 200, 200, 50)) {
                 mainmenu = true;
                 showquestion = false;
                 showhighscore = false;
                 gameover = false;
+                gamewon = false;
             }
         }
         if (showquestion == true) {
@@ -246,6 +248,7 @@ void mouseClick(int button, int state, int x, int y) { //changes if mouse is clc
                         gameover = false;
                         showhighscore = false;
                         resumegame = false;
+                        gamewon = false;
                     }
                     else if (i == 1) {
                         resumegame = true;
@@ -253,6 +256,7 @@ void mouseClick(int button, int state, int x, int y) { //changes if mouse is clc
                         gameover = false;
                         showhighscore = false;
                         showquestion = false;
+                        gamewon = false;
                     }
                     else if (i == 2) {
                         showhighscore = true;
@@ -260,6 +264,7 @@ void mouseClick(int button, int state, int x, int y) { //changes if mouse is clc
                         showquestion = false;
                         gameover = false;
                         resumegame = false;
+                        gamewon = false;
                     }
                     else if (i == 3) {
                         exit(0);
@@ -386,6 +391,7 @@ void display() {
     }
     if (showquestion) {
         mainmenu = false;
+        gamewon = false;
         gameover = false;
         resumegame = false;
         showhighscore = false;
@@ -527,20 +533,37 @@ void display() {
                 if (qs > 1) {
                     savegameprogress(qs);
                 }
+                if (qs == 10) {
+                    gamewon = true;
+                }
         }
          else if (score < 0) {
             gameover = true;
+            gamewon = false;
             showquestion = false;
             showhighscore = false;
             mainmenu = false;
             resumegame = false;
          }
     }
+    if (gamewon) {
+         glClear(GL_COLOR_BUFFER_BIT);
+                    drawhalfminion();
+                    upmoon(1100, 530, 5, 0, 0, 0);
+                    text("YOU WON", 580, 450, 0, 1, 0);
+                    rectangle(1000, 400, 200, 50, 0.2118, 0.1843, 0.8509);
+                    text("SCORE", 1030, 415, 1.0, 1.0, 1.0);
+                    drawInt(score, 1150, 415, 1.0, 1.0, 1.0);
+                    rectangle(mainmenubar[0], mainmenubar[1], mainmenubar[2], mainmenubar[3], mainmenubar[4], mainmenubar[5], mainmenubar[6]);
+                    text("MAIN MENU", 580, 220, 1, 1, 1);
+
+    }
     if (gameover) {
         showquestion = false;
         resumegame = false;
         showhighscore = false;
         mainmenu = false;
+        gamewon = false;
         glClear(GL_COLOR_BUFFER_BIT);
         drawhalfminion();
         downmoon(1100, 520, 5, 0, 0, 0);
@@ -560,6 +583,7 @@ void display() {
           showhighscore = false;
           mainmenu = false;
           gameover = false;
+          gamewon = false;
     }
     if (showhighscore) {
         loadHighScore();
